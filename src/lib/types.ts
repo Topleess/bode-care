@@ -21,6 +21,23 @@ export type User = {
   privacy: string;
 };
 
+export type QuestionnaireProfile = {
+  goal: string;
+  height: string;
+  weight: string;
+  targetWeight: string;
+  age: string;
+  trainingLevel: string;
+  trainingFrequency: string;
+  trainingPlace: string;
+  nutritionMode: string;
+  mealsPerDay: string;
+  foodPreferences: string[];
+  injuries: string;
+  allergies: string;
+  schedule: string;
+};
+
 export type Task = {
   id: string;
   time: string;
@@ -161,6 +178,7 @@ export type AppState = {
   version: number;
   selectedDayId: string;
   user: User;
+  questionnaire: QuestionnaireProfile;
   days: DayState[];
   meals: MealLog[];
   recipes: Recipe[];

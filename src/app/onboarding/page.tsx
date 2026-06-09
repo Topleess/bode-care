@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, ChartNoAxesCombined, Dumbbell, MessageCircle, Utensils } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChartNoAxesCombined, Dumbbell, MessageCircle, Utensils } from "lucide-react";
 
 const slides = [
   {
@@ -39,47 +39,62 @@ export default function OnboardingPage() {
   const Icon = slide.icon;
 
   return (
-    <main className="min-h-dvh bg-background">
-      <div className="safe-pad pb-safe mx-auto flex min-h-dvh max-w-[480px] flex-col justify-between border-x border-white/8 pt-[max(18px,env(safe-area-inset-top))]">
+    <main className="h-dvh overflow-hidden bg-background">
+      <div className="safe-pad pb-safe mx-auto grid h-dvh max-w-[480px] grid-rows-[auto_1fr_auto] border-x border-white/8 pt-[max(14px,env(safe-area-inset-top))]">
         <header className="flex items-center justify-between">
-          <span className="text-sm text-muted">{index + 1} / {slides.length}</span>
+          <div className="flex items-center gap-2">
+            {slides.map((item, dotIndex) => (
+              <button
+                key={item.title}
+                onClick={() => setIndex(dotIndex)}
+                className={`relative overflow-hidden rounded-full transition-colors ${
+                  dotIndex === index ? "h-2.5 w-12 bg-white/20" : "h-2.5 w-2.5"
+                } ${dotIndex < index ? "bg-lime" : "bg-white/20"}`}
+                aria-label={`Открыть экран ${dotIndex + 1}`}
+              >
+                {dotIndex === index && (
+                  <span key={index} className="absolute inset-y-0 left-0 animate-[onboardingProgress_6s_linear_forwards] rounded-full bg-lime" />
+                )}
+              </button>
+            ))}
+          </div>
           <Link href="/questionnaire" className="rounded-full bg-white/8 px-4 py-2 text-sm">
             Пропустить
           </Link>
         </header>
 
-        <section>
-          <div className="mb-10 rounded-[42px] border border-white/10 bg-white/[0.045] p-4">
-            <div className="grid aspect-[0.86] place-items-center rounded-[32px] bg-[radial-gradient(circle_at_50%_30%,rgba(223,255,56,0.14),transparent_34%),#090a09]">
-              <div className={`grid h-28 w-28 place-items-center rounded-[34px] ${slide.accent}`}>
-                <Icon size={54} strokeWidth={1.8} />
+        <section className="flex min-h-0 flex-col py-3 pb-6">
+          <div className="mb-5 rounded-[34px] border border-white/10 bg-white/[0.045] p-3 sm:mb-6 sm:rounded-[42px] sm:p-4">
+            <div className="grid aspect-[0.72] place-items-center rounded-[24px] bg-[radial-gradient(circle_at_50%_30%,rgba(223,255,56,0.14),transparent_34%),#090a09] sm:aspect-[0.86] sm:rounded-[32px]">
+              <div className={`grid h-20 w-20 place-items-center rounded-[24px] sm:h-28 sm:w-28 sm:rounded-[34px] ${slide.accent}`}>
+                <Icon className="h-10 w-10 sm:h-14 sm:w-14" strokeWidth={1.8} />
               </div>
             </div>
           </div>
-          <h1 className="text-5xl font-semibold leading-[0.96] tracking-[-0.03em] text-balance">{slide.title}</h1>
-          <p className="mt-5 text-lg leading-7 text-muted">{slide.text}</p>
-          <div className="mt-8 flex gap-2">
-            {slides.map((item, dotIndex) => (
-              <button
-                key={item.title}
-                onClick={() => setIndex(dotIndex)}
-                className={`h-2 rounded-full transition-all ${dotIndex === index ? "w-10 bg-lime" : "w-2 bg-white/20"}`}
-                aria-label={`Открыть экран ${dotIndex + 1}`}
-              />
-            ))}
-          </div>
+          <h1 className="text-4xl font-semibold leading-[0.94] tracking-[-0.03em] text-balance sm:text-5xl">{slide.title}</h1>
+          <p className="mt-3 text-base leading-6 text-muted sm:mt-5 sm:text-lg sm:leading-7">{slide.text}</p>
         </section>
 
-        <button
-          onClick={() => {
-            if (index < slides.length - 1) setIndex(index + 1);
-            else router.push("/questionnaire");
-          }}
-          className="flex h-14 w-full items-center justify-center rounded-full bg-lime text-base font-semibold text-black"
-        >
-          {index < slides.length - 1 ? "Дальше" : "К анкете"}
-          <ArrowRight className="ml-2" size={20} />
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIndex((prev) => Math.max(prev - 1, 0))}
+            disabled={index === 0}
+            aria-label="Назад"
+            className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-white/14 bg-white/8 text-foreground disabled:opacity-35"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <button
+            onClick={() => {
+              if (index < slides.length - 1) setIndex(index + 1);
+              else router.push("/questionnaire");
+            }}
+            className="flex h-14 w-full items-center justify-center rounded-full bg-lime text-base font-semibold text-black"
+          >
+            {index < slides.length - 1 ? "Дальше" : "К анкете"}
+            <ArrowRight className="ml-2" size={20} />
+          </button>
+        </div>
       </div>
     </main>
   );

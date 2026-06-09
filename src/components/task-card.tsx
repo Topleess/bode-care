@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Check, Clock, Dumbbell, MessageCircle, Utensils } from "lucide-react";
+import { Check, Clock, Dumbbell, MessageCircle, Utensils } from "lucide-react";
 import type { Task } from "@/lib/types";
-import { accentSoft } from "@/lib/ui";
 
 const iconByType = {
   meal: Utensils,
@@ -10,28 +9,38 @@ const iconByType = {
   progress: Check,
 };
 
-export function TaskCard({ task, compact = false }: { task: Task; compact?: boolean }) {
+const solidTaskTone: Record<Task["accent"], string> = {
+  lime: "bg-lime text-black",
+  mint: "bg-mint text-black",
+  aqua: "bg-aqua text-black",
+  coral: "bg-coral text-black",
+  violet: "bg-violet text-black",
+};
+
+export function TaskCard({ task }: { task: Task }) {
   const Icon = iconByType[task.type];
+  const done = task.status === "done";
 
   return (
-    <article className="rounded-[30px] border border-white/10 bg-white/[0.055] p-4 shadow-[0_18px_44px_rgba(0,0,0,0.22)]">
-      <div className="flex items-start gap-3">
-        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${accentSoft[task.accent]}`}>
-          <Icon size={20} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="mb-1 flex items-center gap-2 text-xs text-muted">
-            <Clock size={13} />
+    <Link
+      href={task.href}
+      className={`block rounded-[34px] p-5 shadow-[0_18px_44px_rgba(0,0,0,0.18)] transition active:scale-[0.99] ${
+        done ? "border border-white/10 bg-white/[0.055] text-foreground/72" : solidTaskTone[task.accent]
+      }`}
+    >
+      <div className="flex items-start justify-between gap-5">
+        <div className="min-w-0">
+          <div className={`mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm ${done ? "bg-white/8 text-muted" : "bg-black/10 text-black/72"}`}>
+            <Clock size={15} />
             <span>{task.time}</span>
           </div>
-          <h3 className="text-lg font-semibold leading-tight">{task.title}</h3>
-          {!compact && <p className="mt-2 text-sm leading-5 text-muted">{task.detail}</p>}
+          <h3 className="text-3xl font-semibold leading-none">{task.title}</h3>
+          <p className={`mt-3 text-sm leading-5 ${done ? "text-muted" : "text-black/68"}`}>{task.detail}</p>
+        </div>
+        <div className={`grid h-14 w-14 shrink-0 place-items-center rounded-full ${done ? "bg-white/8 text-muted" : "bg-black/10 text-black"}`}>
+          <Icon size={24} />
         </div>
       </div>
-      <Link href={task.href} className="mt-4 flex h-12 w-full items-center justify-between rounded-full bg-white px-5 text-sm font-semibold text-black active:scale-[0.99]">
-        <span>{task.action}</span>
-        <ArrowRight size={18} />
-      </Link>
-    </article>
+    </Link>
   );
 }
