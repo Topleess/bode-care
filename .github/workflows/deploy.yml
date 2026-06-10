@@ -27,14 +27,11 @@ jobs:
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-      - name: Trust deploy host
-        run: |
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
-
       - name: Deploy
         run: |
           ssh -i ~/.ssh/deploy_key \
             -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=accept-new \
             "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
             'set -eu
              cd /opt/apps/sport-app
