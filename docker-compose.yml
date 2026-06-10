@@ -1,0 +1,13 @@
+services:
+  sport-app:
+    build:
+      context: .
+    container_name: sport-app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    ports:
+      - "127.0.0.1:3202:3000"

@@ -1,0 +1,47 @@
+name: Deploy sport app
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: sport-app-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to daria
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Trust deploy host
+        run: |
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -o IdentitiesOnly=yes \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" \
+            'set -eu
+             cd /opt/apps/sport-app
+             git pull --ff-only origin main
+             docker compose up -d --build
+             docker compose ps
+             curl -fsS -I http://127.0.0.1:3202 >/dev/null
+             sudo caddy validate --config /etc/caddy/Caddyfile
+             sudo systemctl reload caddy
+             curl -fsS -I https://sport.as-shamshurin.xyz >/dev/null'
