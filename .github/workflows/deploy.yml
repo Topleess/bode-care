@@ -41,7 +41,23 @@ jobs:
              git pull --ff-only origin main
              docker compose up -d --build
              docker compose ps
-             curl -fsS -I http://127.0.0.1:3202 >/dev/null
+             for i in $(seq 1 30); do
+               if curl -fsS -I http://127.0.0.1:3202 >/dev/null; then
+                 break
+               fi
+               if [ "$i" -eq 30 ]; then
+                 exit 1
+               fi
+               sleep 2
+             done
              sudo caddy validate --config /etc/caddy/Caddyfile
              sudo systemctl reload caddy
-             curl -fsS -I https://sport.as-shamshurin.xyz >/dev/null'
+             for i in $(seq 1 30); do
+               if curl -fsS -I https://sport.as-shamshurin.xyz >/dev/null; then
+                 break
+               fi
+               if [ "$i" -eq 30 ]; then
+                 exit 1
+               fi
+               sleep 2
+             done'
